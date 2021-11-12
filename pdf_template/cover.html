@@ -1,0 +1,128 @@
+<article id="doc-cover">
+	<style>
+		@font-face {
+			font-family: "Atkinson Hyperlegible";
+			src: url("https://raw.githubusercontent.com/Dyalog/RP-Jenkins-Testing/main/docs/assets/Atkinson-Hyperlegible-Regular-102.ttf") format("truetype");
+		}
+		@font-face {
+			font-family: APL;
+			src: local("APL385 Unicode"), url("https://tryapl.org/assets/apl385.ttf") format("truetype");
+		}
+		@page {
+			size: 192mm 252mm;
+			margin: 10mm;
+			@top-right {
+			  font-size: 7pt;
+			  content: string(chapter);			  
+			}        
+			@bottom-center { content: ''; }
+			@bottom-right {
+			  font-size: 8pt;
+			  content: counter(page)'/'counter(pages);
+			}	
+			@bottom-left {
+			  font-size:  7pt;
+			  content: 'revision ∆DOCREVISION∆';
+			}
+		}	
+		@page :first {
+			margin: 0mm;
+			@bottom-left {
+				content: '';
+			}
+		}
+		* {font-family: "Verdana"!important;}
+        article#doc-cover > .wrapper.upper {
+            padding: 0 2em 0 0;
+        }        
+        code {font-family: APL!important;}
+		article#doc-cover > .wrapper.upper > h1,
+		article#doc-cover > .wrapper.upper > h2 {
+			position: relative;
+			top: -60px;
+			font-size: 25pt;
+			float: right;
+			line-height: 1;
+			padding: 0;
+			margin: 0;
+		}
+		article#doc-cover > .wrapper.upper > h2 {
+			margin-top: 2rem;
+		}
+		article#doc-cover > .wrapper.upper .toolVersion {
+			color: #d2691e;
+		}		
+		article h1,h2,h3,h4,h5,h6 {border-bottom: none!important; font-weight: bold!important; margin: 1mm!important;}
+		article h4 { font-size: 1.5em; }
+		article#doc-cover > .wrapper.logo {padding:0; margin:0;}
+		article#doc-cover > .wrapper > .logo {
+            /* Cover swirl image */
+			height: 450px;
+			width: 100vw;
+			padding: 0;
+			margin: 0;
+			background-size: contain;
+			background-repeat: no-repeat;
+            position: relative;
+            top: 12em;
+		}
+        #coverLogo { 
+            /* Dyalog logo image */
+            background-size: contain;
+            background-repeat: no-repeat;
+            position: relative;
+            z-index: 3;
+            height: 70px;
+            top: 5em;
+            left: 255px;
+        }
+        article#doc-cover > .wrapper.coverLogo > p {
+            /* Tool of Thought tagline */
+            position: relative;
+            left: 150px;
+            top: 43px;
+            font-size: 15pt;
+            font-weight: bold;
+        }
+        article#doc-toc {margin: 10mm;}
+        article#doc-toc > ul > li { font-weight: bold; }
+        article#doc-toc ul li ul { font-weight: normal; }
+	</style>
+	<div class="wrapper upper">
+		<h1>RP</h1>
+		<h1>User Guide</h1>
+		<h2>RP version <span class="toolVersion">∆MAJORMINOR∆</span></h2>
+	</div>
+	{% if cover_logo is defined %}
+		<div class="wrapper logo">
+			<div class="logo" style="background-image: url({{ cover_logo | to_url }});"></div>
+		</div>
+	{% else %}
+		<div class="wrapper"></div>
+	{% endif %}
+	<div class="wrapper coverLogo">
+		<div id="coverLogo" style="background-image: url('https://raw.githubusercontent.com/Dyalog/RP-Jenkins-Testing/main/docs/img/cover_logo.svg');"></div>
+				<p>The Tool of Thought for Software Solutions</p>
+	</div>
+</article>
+<style>
+		article#doc-info {
+				padding: 3rem;
+		}
+</style>
+<article id ="doc-info">
+	<div class="wrapper lower">
+		<p><em>
+			Dyalog is a trademark of Dyalog Limited<br>
+			Copyright © 1982-∆YEAR∆ by Dyalog Limited<br>
+			All rights reserved.
+		</em></p>
+		<p>RP User Guide</p>
+		<p>RP version ∆MAJORMINOR∆</p>
+		<p>Document Revision: ∆DOCREVISION∆</p>
+		<p>Unless stated otherwise, all examples in this document assume that <code>(⎕IO ⎕ML)←1</code></p>
+		<p>No part of this publication may be reproduced in any form by any means without the prior written permission of Dyalog Limited.</p>
+		<p>Dyalog Limited makes no representations or warranties with respect to the contents hereof and specifically disclaims any implied warranties of merchantability or fitness for any particular purpose. Dyalog Limited reserves the right to revise this publication without notification.</p>
+		<p>https://dyalog.com</p>
+	</div>
+</article>
