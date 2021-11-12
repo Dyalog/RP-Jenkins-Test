@@ -13,6 +13,6 @@ git config user.email "RPJenkinsCI@github.com"
 
 git remote set-url origin https://$GHTOKEN@github.com/${REPO}.git
 
-mike deploy ${VERSION}
+mike build ${VERSION}
 mike set-default ${VERSION}
 mike alias --push ${VERSION} latest
