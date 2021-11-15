@@ -1,7 +1,0 @@
-# Container to build tool and deploy docs via mkdocs/mike
-FROM squidfunk/mkdocs-material:latest
-ENTRYPOINT [""]
-CMD ["/bin/sh"]
-RUN apk update && apk add bash curl jq gcc libc-dev libffi-dev zlib-dev jpeg-dev g++
-RUN pip install --upgrade pip
-RUN pip install mkdocs-with-pdf mike
