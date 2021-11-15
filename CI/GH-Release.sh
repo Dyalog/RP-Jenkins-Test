@@ -29,7 +29,7 @@ GH_RELEASES=/tmp/GH-Releases.${PROJECT}.$$.json
 # --- Inject full version number, has side effects in copied source ---
 RAW_VERSION=`cat HttpCommand.dyalog | grep "__version←'HttpCommand' '[0-9]\+\.[0-9]\+\.0-\?\w\+\?" | grep -o "[0-9]\+\.[0-9]\+\.0-\?\w\+\?"`
 VERSION_AB=`echo ${RAW_VERSION} | grep -o "[0-9]\+\.[0-9]\+"`
-VERSION=$(./CI/inject_version)
+VERSION=$(./CI/inject_version.sh)
 echo ${VERSION} > ___version___
 echo "Creating draft release for ${VERSION}"
 
