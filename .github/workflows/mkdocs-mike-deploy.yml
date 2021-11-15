@@ -27,7 +27,6 @@ jobs:
       - uses: actions/setup-python@v2
         with:
           python-version: '3.x'
-        
 
       - name: install-deps
         run: |
@@ -44,9 +43,11 @@ jobs:
           git config user.name "GitHub Actions CI Publisher"
           git config user.email "DyalogGithubActions@github.com"
           git fetch origin gh-pages --depth=1
+          git stash
           git checkout gh-pages
           git pull origin gh-pages
           git checkout master
+          git stash apply
           mike deploy ${MAJMIN}
           mike set-default ${MAJMIN}
           mike alias --update-aliases --push ${MAJMIN} latest
