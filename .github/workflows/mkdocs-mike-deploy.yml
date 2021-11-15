@@ -32,7 +32,7 @@ jobs:
         run: |
           apk update && apk add bash curl jq gcc libc-dev libffi-dev zlib-dev jpeg-dev g++
           pip install --upgrade pip
-          pip install mkdocs-with-pdf mike
+          pip install mkdocs-material mkdocs-with-pdf mike
 
       # Inject version and document revision information into docs/ source      
       # Build and deploy docs site and pdf
