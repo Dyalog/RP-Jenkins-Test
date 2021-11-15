@@ -15,4 +15,4 @@ git remote set-url origin https://$GHTOKEN@github.com/${REPO}.git
 
 mike deploy ${VERSION}
 mike set-default ${VERSION}
-mike alias --push ${VERSION} latest
+mike alias --update-aliases --push ${VERSION} latest
