@@ -46,6 +46,7 @@ theme:
   features:
     - navigation.sections
     - navigation.instant
+  custom_dir: overrides
   name: material
 
 extra_css:
