@@ -19,28 +19,13 @@ jobs:
   docs_deploy:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
+    container: rikedyp/dtools
+    # runs-on: ubuntu-latest
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
-      # Use python for dependencies
-      - uses: actions/setup-python@v2
-        with:
-          python-version: '3.x'
-      # Cache installed packages
-      - uses: actions/cache@v2
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-
-            
-      - name: install-deps
-        run: |
-          apk update && apk add bash curl jq gcc libc-dev libffi-dev zlib-dev jpeg-dev g++
-          pip install --upgrade pip
-          pip install mkdocs-material mkdocs-with-pdf mike
 
       # Inject version and document revision information into docs/ source      
       # Build and deploy docs site and pdf
