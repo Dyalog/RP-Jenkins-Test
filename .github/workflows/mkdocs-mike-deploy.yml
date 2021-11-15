@@ -27,7 +27,10 @@ jobs:
       - uses: actions/setup-python@v2
         with:
           python-version: '3.x'
-          
+
+      - name: Cache
+        uses: actions/cache@v2.1.6
+
       - name: install-deps
         run: |
           apk update && apk add bash curl jq gcc libc-dev libffi-dev zlib-dev jpeg-dev g++
@@ -43,6 +46,9 @@ jobs:
           git config user.name "GitHub Actions CI Publisher"
           git config user.email "DyalogGithubActions@github.com"
           git fetch origin gh-pages --depth=1
+          git checkout gh-pages
+          git pull origin gh-pages
+          git checkout master
           mike deploy ${MAJMIN}
           mike set-default ${MAJMIN}
           mike alias --update-aliases --push ${MAJMIN} latest
