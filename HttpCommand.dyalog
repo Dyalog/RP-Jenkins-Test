@@ -221,7 +221,7 @@
 
     ∇ __version←Version
       :Access public shared
-      __version←'HttpCommand' '3.4.0' '2021-11-11'
+      __version←'HttpCommand' '3.5.0' '2021-11-11'
     ∇
 
     ∇ make
