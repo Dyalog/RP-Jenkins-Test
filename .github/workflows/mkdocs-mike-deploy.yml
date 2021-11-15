@@ -40,6 +40,8 @@ jobs:
         run: |
           VER=$( CI/inject_version )
           MAJMIN=$(echo ${VER} | grep -o '[0-9]\+\.[0-9]\+')
+          git config user.name "GitHub Actions CI Publisher"
+          git config user.email "DyalogGithubActions@github.com"
           mike deploy ${MAJMIN}
           mike set-default ${MAJMIN}
           mike alias --update-aliases --push ${MAJMIN} latest
