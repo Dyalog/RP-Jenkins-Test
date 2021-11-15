@@ -45,12 +45,15 @@ jobs:
       # Inject version and document revision information into docs/ source      
       # Build and deploy docs site and pdf
       - name: docs-deploy
+        env: 
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           VER=$( CI/inject_version )
           MAJMIN=$(echo ${VER} | grep -o '[0-9]\+\.[0-9]\+')
           git config user.name "GitHub Actions CI Publisher"
           git config user.email "DyalogGithubActions@github.com"
           git fetch origin gh-pages --depth=1
+          git remote set-url --push origin https://dyalog:$GITHUB_TOKEN@github.com/Dyalog/RP-Jenkins-Test
           mike deploy ${MAJMIN}
           mike set-default ${MAJMIN}
           mike alias --update-aliases --push ${MAJMIN} latest
