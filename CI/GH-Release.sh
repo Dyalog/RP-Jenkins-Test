@@ -4,9 +4,9 @@ set -e
 WORKSPACE=${WORKSPACE-$PWD}
 cd ${WORKSPACE}
 
-PROJECT=RP
 REPO_URL=`git ls-remote --get-url origin`
-REPO=`echo ${REPO_URL} | grep -o "Dyalog/.*.git$" | rev | cut -c 5- | rev`
+REPO=`echo ${REPO_URL} | grep -o "Dyalog/.*"`
+PROJECT=`echo ${REPO} | cut -c 8-`
 echo ${REPO} > ___repo___
 
 echo "Running from ${REPO_URL}"
@@ -15,23 +15,33 @@ GIT_BRANCH=${JOB_NAME#*/*/}
 MAIN_BRANCH=`git remote show ${REPO_URL} | grep "HEAD branch" | sed "s/  HEAD branch: //"`
 GIT_COMMIT=$(git rev-parse HEAD)
 
-if ! [ "${GIT_BRANCH}" = "${MAIN_BRANCH}" ]; then # Should be able to get "default" branch via git
-	echo "Skipping creating release for ${GIT_BRANCH}"
-	exit 0
-else
-	echo "Creating ${GIT_BRANCH} release"
-fi
+DELETE_DRAFTS=0   # If it is not the main branch, do not delete previous draft releases
+
+# Compare git branch
+case $GIT_BRANCH in
+	$MAIN_BRANCH)   # Add support branches like: $MAIN_BRANCH|3.2-180SUPPORT)
+		echo "Creating ${GIT_BRANCH} release"
+		if [ "{GIT_BRANCH}" = "{MAIN_BRANCH}" ]; then
+			DELETE_DRAFTS=1
+		fi
+	;;
+	**)
+		echo "skipping creating release for ${GIT_BRANCH}"
+esac
 
 # --- Create JSON release notes ---
 TMP_JSON=/tmp/GH-Publish.${PROJECT}.$$.json
 GH_RELEASES=/tmp/GH-Releases.${PROJECT}.$$.json
 
 # --- Inject full version number, has side effects in copied source ---
-RAW_VERSION=`cat HttpCommand.dyalog | grep "__version←'HttpCommand' '[0-9]\+\.[0-9]\+\.0-\?\w\+\?" | grep -o "[0-9]\+\.[0-9]\+\.0-\?\w\+\?"`
-VERSION_AB=`echo ${RAW_VERSION} | grep -o "[0-9]\+\.[0-9]\+"`
+
 VERSION=$(./CI/inject_version.sh)
+VERSION_AB=`echo ${VERSION} | grep -o "[0-9]\+\.[0-9]\+"`
 echo ${VERSION} > ___version___
 echo "Creating draft release for ${VERSION}"
+
+# VERSION_ND: No decimals e.g. 3.5.10 → 3510
+# VERSION_AB: major.minor e.g. 3.5.10 → 3.5
 
 if ! [ "$GHTOKEN" ]; then
   echo 'Please put your GitHub API Token in an environment variable named GHTOKEN'
@@ -40,33 +50,27 @@ fi
 
 # Delete all the old draft releases, otherwise this gets filled up pretty fast as we create for every commit:
 # but only if jq is available
-if which jq >/dev/null 2>&1; then
-        DRAFT=true
-        C=0
+if which jq >/dev/null 2>&1 && [ 1 = $DELETE_DRAFTS ]; then
+	DRAFT=true
+	C=0
 	# Get the json from Github API
-        curl -o $GH_RELEASES \
-          --silent -H "Authorization: token $GHTOKEN" \
-          https://api.github.com/repos/${REPO}/releases
+	curl -o $GH_RELEASES \
+	--silent -H "Authorization: token $GHTOKEN" \
+	https://api.github.com/repos/${REPO}/releases
 
 	RELEASE_COUNT=`cat $GH_RELEASES | jq ". | length"`
 	echo "Release Count: ${RELEASE_COUNT}"
 
 	GH_VERSION_ND_LAST=0
 	while [ $C -le $RELEASE_COUNT ] ; do
-
 		DRAFT=`cat $GH_RELEASES | jq -r ".[$C].draft"`
-		
 		ID=`cat $GH_RELEASES | jq -r ".[$C].id"`
-		
 		GH_VERSION=$(cat $GH_RELEASES | jq -r ".[$C].name" | sed 's/^v//' | sed 's/-.*//')
 		GH_VERSION_ND=$(cat $GH_RELEASES | jq -r ".[$C].name" | sed 's/^v//;s/\.//g' | sed 's/-.*//')
 		GH_VERSION_AB=${GH_VERSION%.*}
-		echo "Version:"
-		echo ${GH_VERSION}
-		echo ${GH_VERSION_ND}
-		echo ${GH_VERSION_AB}
-		
-		if [ "${GH_VERSION_AB}" = "${VERSION_AB}" ]; then
+
+		if [ "${GH_VERSION_AB}" = "${VERSION_AB}" ] ; then
+		# If same minor version and there is an unpublished draft release of a previous patch, delete that draft
 			if [ "$DRAFT" = "true" ]; then
 				echo -e -n "*** $(cat $GH_RELEASES | jq -r ".[$C].name") with id: $(cat $GH_RELEASES | jq -r ".[$C].id") is a draft - Deleting.\n"
 				curl -X "DELETE" -H "Authorization: token $GHTOKEN" https://api.github.com/repos/${REPO}/releases/${ID}
@@ -75,6 +79,7 @@ if which jq >/dev/null 2>&1; then
 					echo getting sha for latest release
 					COMMIT_SHA=`cat $GH_RELEASES | jq -r ".[$C].target_commitish"`
 					GH_VERSION_ND_LAST=$GH_VERSION_ND
+					PRERELEASE=`cat $GH_RELEASES | jq -r ".[$C].prerelease"`
 				fi
 			fi
 		fi
@@ -84,7 +89,7 @@ if which jq >/dev/null 2>&1; then
 	rm -f $GH_RELEASES
 
 else
-        echo jq not found, not removing draft releases
+	echo not removing draft releases
 fi
 
 
@@ -93,12 +98,18 @@ echo "SHA: ${COMMIT_SHA}"
 # GH_VERSION_ND_LAST seems to be 0 on new minor version?
 
 if [ $GH_VERSION_ND_LAST = 0 ]; then
-	echo using log from $COMMIT_SHA from $GH_VERSION_ND_LAST
-	JSON_BODY=$( ( echo -e "HttpCommand $VERSION_AB\n\nChangelog:"; git log --format='%s') | python -c 'import json,sys; print(json.dumps(sys.stdin.read()))')
+	echo "No releases of ${VERSION_AB} found, not populating changelog"
+	JSON_BODY=$( ( echo -e "Pre-Release of $PROJECT $VERSION_AB\n\nWARNING: This is a pre-release version of $PROJECT $VERSION_AB: it is possible that functionality may be added, removed or altered; we do not recommend using pre-release versions of $PROJECT in production environment." | python -c 'import json,sys; print(json.dumps(sys.stdin.read()))' ) )
+	PRELEASE=true
 else
 	echo using log from $COMMIT_SHA from $GH_VERSION_ND_LAST
-	JSON_BODY=$( ( echo -e "HttpCommand $VERSION_AB\n\nChangelog:"; git log --format='%s' ${COMMIT_SHA}.. ) | python -c 'import json,sys; print(json.dumps(sys.stdin.read()))')
-	
+	echo "Is Pre-Release:: ${PRERELEASE}"
+	if [ "{$PRERELEASE}" = "false" ]; then
+		MSG_TEXT="Release ${PROJECT} ${VERSION_AB}\n\n"
+	else
+		MSG_TEXT="Pre-Release of $PROJECT ${VERSION_AB}\n\nWARNING: This is a pre-release version of RIDE ${VERSION_AB}: it is possible that functionality may be added, removed or altered; we do not recommend using pre-release versions of $PROJECT in production environments.\n\n"
+	fi
+	JSON_BODY=$( ( echo -e "${MSG_TEXT}Changelog:"; git log --format='%s' ${COMMIT_SHA}.. ) | grep -v -i todo | python -c 'import json,sys; print(json.dumps(sys.stdin.read()))')
 fi
 
 cat >$TMP_JSON <<.
@@ -113,15 +124,6 @@ cat >$TMP_JSON <<.
 .
 
 cat $TMP_JSON
-
-# --- Copy file to Dyalog Devt ---
-# r=/devt/builds/${PROJECT}/${GIT_BRANCH}
-# d=/${BUILD_NUMBER}
-
-# mkdir -p $r/$d
-# cp ./HttpCommand.dyalog $r/$d
-
-# echo 'Updating "latest" symlink'; l=$r/latest; rm -f $l; ln -s $r/$d $l
 
 TMP_RESPONSE=/tmp/GH-Response.${PROJECT}.$$.json
 curl -o $TMP_RESPONSE --data @$TMP_JSON -H "Authorization: token $GHTOKEN" -i https://api.github.com/repos/$REPO/releases
