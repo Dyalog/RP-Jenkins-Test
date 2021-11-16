@@ -68,7 +68,11 @@ if which jq >/dev/null 2>&1 && [ 1 = $DELETE_DRAFTS ]; then
 		GH_VERSION=$(cat $GH_RELEASES | jq -r ".[$C].name" | sed 's/^v//' | sed 's/-.*//')
 		GH_VERSION_ND=$(cat $GH_RELEASES | jq -r ".[$C].name" | sed 's/^v//;s/\.//g' | sed 's/-.*//')
 		GH_VERSION_AB=${GH_VERSION%.*}
-
+		echo "VERSIONS"
+		echo $C
+		echo $GH_VERSION
+		echo $GH_VERSION_ND
+		echo $GH_VERSION_AB
 		if [ "${GH_VERSION_AB}" = "${VERSION_AB}" ] ; then
 		# If same minor version and there is an unpublished draft release of a previous patch, delete that draft
 			if [ "$DRAFT" = "true" ]; then
