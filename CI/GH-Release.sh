@@ -21,15 +21,13 @@ DELETE_DRAFTS=0   # If it is not the main branch, do not delete previous draft r
 case $GIT_BRANCH in
 	$MAIN_BRANCH)   # Add support branches like: $MAIN_BRANCH|3.2-180SUPPORT)
 		echo "Creating ${GIT_BRANCH} release"
-		if [ "${GIT_BRANCH}" = "${MAIN_BRANCH}" ]; then
+		if [ $GIT_BRANCH = $MAIN_BRANCH ]; then
 			DELETE_DRAFTS=1
 		fi
 	;;
 	**)
 		echo "skipping creating release for ${GIT_BRANCH}"
 esac
-
-echo "DELETE DRAFTS: ${DELETE_DRAFTS}"
 
 # --- Create JSON release notes ---
 TMP_JSON=/tmp/GH-Publish.${PROJECT}.$$.json
