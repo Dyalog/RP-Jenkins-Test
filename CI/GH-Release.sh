@@ -21,7 +21,7 @@ DELETE_DRAFTS=0   # If it is not the main branch, do not delete previous draft r
 case $GIT_BRANCH in
 	$MAIN_BRANCH)   # Add support branches like: $MAIN_BRANCH|3.2-180SUPPORT)
 		echo "Creating ${GIT_BRANCH} release"
-		if [ "{GIT_BRANCH}" = "{MAIN_BRANCH}" ]; then
+		if [ $GIT_BRANCH = $MAIN_BRANCH ]; then
 			DELETE_DRAFTS=1
 		fi
 	;;
@@ -103,7 +103,7 @@ if [ $GH_VERSION_ND_LAST = 0 ]; then
 	PRELEASE=true
 else
 	echo using log from $COMMIT_SHA from $GH_VERSION_ND_LAST
-	echo "Is Pre-Release:: ${PRERELEASE}"
+	echo "Is Pre-Release: ${PRERELEASE}"
 	if [ "{$PRERELEASE}" = "false" ]; then
 		MSG_TEXT="Release ${PROJECT} ${VERSION_AB}\n\n"
 	else
