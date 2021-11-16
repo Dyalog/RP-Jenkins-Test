@@ -29,7 +29,7 @@ GH_RELEASES=/tmp/GH-Releases.${PROJECT}.$$.json
 # --- Inject full version number, has side effects in copied source ---
 RAW_VERSION=`cat HttpCommand.dyalog | grep "__version←'HttpCommand' '[0-9]\+\.[0-9]\+\.0-\?\w\+\?" | grep -o "[0-9]\+\.[0-9]\+\.0-\?\w\+\?"`
 VERSION_AB=`echo ${RAW_VERSION} | grep -o "[0-9]\+\.[0-9]\+"`
-VERSION=$(./CI/inject_version)
+VERSION=$(./CI/inject_version.sh)
 echo ${VERSION} > ___version___
 echo "Creating draft release for ${VERSION}"
 
@@ -61,6 +61,10 @@ if which jq >/dev/null 2>&1; then
 		GH_VERSION=$(cat $GH_RELEASES | jq -r ".[$C].name" | sed 's/^v//' | sed 's/-.*//')
 		GH_VERSION_ND=$(cat $GH_RELEASES | jq -r ".[$C].name" | sed 's/^v//;s/\.//g' | sed 's/-.*//')
 		GH_VERSION_AB=${GH_VERSION%.*}
+		echo "Version:"
+		echo ${GH_VERSION}
+		echo ${GH_VERSION_ND}
+		echo ${GH_VERSION_AB}
 		
 		if [ "${GH_VERSION_AB}" = "${VERSION_AB}" ]; then
 			if [ "$DRAFT" = "true" ]; then
@@ -85,6 +89,8 @@ fi
 
 
 echo "SHA: ${COMMIT_SHA}"
+
+# GH_VERSION_ND_LAST seems to be 0 on new minor version?
 
 if [ $GH_VERSION_ND_LAST = 0 ]; then
 	echo using log from $COMMIT_SHA from $GH_VERSION_ND_LAST
