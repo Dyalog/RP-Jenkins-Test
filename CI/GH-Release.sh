@@ -63,7 +63,10 @@ if which jq >/dev/null 2>&1 && [ 1 = $DELETE_DRAFTS ]; then
 
 	GH_VERSION_ND_LAST=0
 	while [ $C -le $RELEASE_COUNT ] ; do
+		echo "here"
+		cat $GH_RELEASES
 		DRAFT=`cat $GH_RELEASES | jq -r ".[$C].draft"`
+		echo "uh oh"
 		ID=`cat $GH_RELEASES | jq -r ".[$C].id"`
 		GH_VERSION=$(cat $GH_RELEASES | jq -r ".[$C].name" | sed 's/^v//' | sed 's/-.*//')
 		GH_VERSION_ND=$(cat $GH_RELEASES | jq -r ".[$C].name" | sed 's/^v//;s/\.//g' | sed 's/-.*//')
