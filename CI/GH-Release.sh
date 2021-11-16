@@ -79,7 +79,7 @@ if which jq >/dev/null 2>&1 && [ 1 = $DELETE_DRAFTS ]; then
 					echo getting sha for latest release
 					COMMIT_SHA=`cat $GH_RELEASES | jq -r ".[$C].target_commitish"`
 					GH_VERSION_ND_LAST=$GH_VERSION_ND
-					PRERELEASE=`cat $GH_RELEASES | jq -r ".[$C].prerelease"`
+					#PRERELEASE=`cat $GH_RELEASES | jq -r ".[$C].prerelease"`
 				fi
 			fi
 		fi
