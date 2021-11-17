@@ -5,25 +5,21 @@ WORKSPACE=${WORKSPACE-$PWD}
 cd ${WORKSPACE}
 
 REPO_URL=`git ls-remote --get-url origin`
-REPO=`echo ${REPO_URL} | grep -o "Dyalog/[^.]\+"`
-PROJECT=`echo ${REPO} | cut -c 8-`
-echo ${REPO} > ___repo___
-echo $REPO_URL
-echo $REPO
-echo $PROJECT
+REPO=`echo $REPO_URL | grep -o "Dyalog/[^.]\+"`
+PROJECT=`echo $REPO | cut -c 8-`
 
 echo "Running from ${REPO_URL}"
 
 GIT_BRANCH=${JOB_NAME#*/*/}
-MAIN_BRANCH=`git remote show ${REPO_URL} | grep "HEAD branch" | sed "s/  HEAD branch: //"`
-GIT_COMMIT=$(git rev-parse HEAD)
+MAIN_BRANCH=`git remote show $REPO_URL | grep "HEAD branch" | sed "s/  HEAD branch: //"`
+GIT_COMMIT=`git rev-parse HEAD`
 
 DELETE_DRAFTS=0   # If it is not the main branch, do not delete previous draft releases
 
 # Compare git branch
 case $GIT_BRANCH in
-	$MAIN_BRANCH)   # Add support branches like: $MAIN_BRANCH|3.2-180SUPPORT)
-		echo "Creating ${GIT_BRANCH} release"
+	$MAIN_BRANCH   # Add support branches explicitly to case list e.g. $MAIN_BRANCH|3.2-180SUPPORT)
+		echo "Creating $GIT_BRANCH release"
 		if [ $GIT_BRANCH = $MAIN_BRANCH ]; then
 			DELETE_DRAFTS=1
 		fi
@@ -38,9 +34,8 @@ GH_RELEASES=/tmp/GH-Releases.${PROJECT}.$$.json
 
 # --- Inject full version number, has side effects in copied source ---
 
-VERSION=$(./CI/inject_version.sh)
-VERSION_AB=`echo ${VERSION} | grep -o "[0-9]\+\.[0-9]\+"`
-echo ${VERSION} > ___version___
+VERSION=`./CI/inject_version.sh`   # inject_version.sh returns full patch version number
+VERSION_AB=`echo $VERSION | grep -o "[0-9]\+\.[0-9]\+"`
 echo "Creating draft release for ${VERSION}"
 
 # VERSION_ND: No decimals e.g. 3.5.10 → 3510
@@ -66,19 +61,11 @@ if which jq >/dev/null 2>&1 && [ 1 = $DELETE_DRAFTS ]; then
 
 	GH_VERSION_ND_LAST=0
 	while [ $C -le $RELEASE_COUNT ] ; do
-		echo "here"
-		cat $GH_RELEASES
 		DRAFT=`cat $GH_RELEASES | jq -r ".[$C].draft"`
-		echo "uh oh"
 		ID=`cat $GH_RELEASES | jq -r ".[$C].id"`
 		GH_VERSION=$(cat $GH_RELEASES | jq -r ".[$C].name" | sed 's/^v//' | sed 's/-.*//')
 		GH_VERSION_ND=$(cat $GH_RELEASES | jq -r ".[$C].name" | sed 's/^v//;s/\.//g' | sed 's/-.*//')
 		GH_VERSION_AB=${GH_VERSION%.*}
-		echo "VERSIONS"
-		echo $C
-		echo $GH_VERSION
-		echo $GH_VERSION_ND
-		echo $GH_VERSION_AB
 		if [ "${GH_VERSION_AB}" = "${VERSION_AB}" ] ; then
 		# If same minor version and there is an unpublished draft release of a previous patch, delete that draft
 			if [ "$DRAFT" = "true" ]; then
@@ -105,13 +92,11 @@ fi
 
 echo "SHA: ${COMMIT_SHA}"
 
-# GH_VERSION_ND_LAST seems to be 0 on new minor version?
-
-if [ $GH_VERSION_ND_LAST = 0 ]; then
+if [ $GH_VERSION_ND_LAST = 0 ]; then   # New minor or major version
 	echo "No releases of ${VERSION_AB} found, not populating changelog"
 	JSON_BODY=$( ( echo -e "Pre-Release of $PROJECT $VERSION_AB\n\nWARNING: This is a pre-release version of $PROJECT $VERSION_AB: it is possible that functionality may be added, removed or altered; we do not recommend using pre-release versions of $PROJECT in production environment." | python -c 'import json,sys; print(json.dumps(sys.stdin.read()))' ) )
 	PRELEASE=true
-else
+else                                     # New patch version
 	echo using log from $COMMIT_SHA from $GH_VERSION_ND_LAST
 	echo "Is Pre-Release: ${PRERELEASE}"
 	if [ "{$PRERELEASE}" = "false" ]; then
