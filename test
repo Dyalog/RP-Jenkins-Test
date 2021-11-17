@@ -1,0 +1,39 @@
+#!/bin/bash
+
+REPO_URL=$g2
+RU=$REPO_URL
+echo $RU
+
+echo ok
+
+echo ${REPO_URL} | grep -o "Dyalog/[^.]\+"
+
+echo ok
+
+
+
+echo ----------
+echo ${REPO} | cut -c 8-
+
+echo $REPO_URL | grep -o "\.git"
+
+if echo $REPO | grep -o "\.git"; then
+	echo YES
+fi
+
+echo $DELETE_DRAFTS
+if which jq >/dev/null 2>&1 && [ 1 = $DELETE_DRAFTS ]; then
+	echo creating draft release
+else
+	echo NO
+fi
+
+case $GIT_BRANCH in
+	$MAIN_BRANCH)
+		echo FOUND
+		if [ $GIT_BRANCH = $MAIN_BRANCH ]; then
+			echo DUBLY SO
+		fi
+	;;
+	**)
+esac
