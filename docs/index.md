@@ -1,11 +1,7 @@
 # Introduction
-*Link* enables users of Dyalog to store their APL source code in text files. This is the documentation for Link Version 3.0, which will be released in the autumn of 2021 and included with the next release of Dyalog APL. If you have an earlier version of APL or Link, you might want to read one or more of the following pages before continuing: 
 
-* [Link version 2.0](https://github.com/Dyalog/link/blob/master/help/Home.md) If you are actually looking for documentation of the version which was distributed with Dyalog APL versions 17.1 and 18.0.
-* [Migrating to Link 3.0 from Link 2.0:](Upgradeto30.md) Dyalog recommends migrating to version 3.0 at your earliest convenience.
-* [Migrating to Link 3.0 from SALT:](Usage/SALTtoLink.md) If you have APL source in text files managed by SALT that you want to migrate to Link.
-* [Installation instructions:](Usage/Installation.md) If you want to download and install Link from the GitHub repository rather than use the version installed with APL, for example if you want to use Link 3.0 with Dyalog version 18.0.
-* [The historical perspective:](Discussion/History.md) Link is a step on a journey which begins more than a decade ago with the introduction of SALT for managing source code in text files, as an alternative to binary workspaces and files, and will hopefully end with the interpreter handling everything itself.
+## Retroactive Update
+This is a change to show how the documentation can be updated retroactively. This should be avoided where possible.
 
 ## Audience
 It is assumed the reader has a reasonable understanding of Dyalog and in particular workspaces, and namespaces.
