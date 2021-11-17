@@ -1,5 +1,9 @@
 pipeline {
-	agent none
+	agent {
+		docker {
+			image 'dyalogci/node:lts'
+		}
+	}
 	stages {
 		stage ('GitHub Upload Draft Release') {
 			steps {
