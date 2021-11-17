@@ -18,6 +18,10 @@ DELETE_DRAFTS=0   # If it is not the main branch, do not delete previous draft r
 
 # Compare git branch
 case $GIT_BRANCH in
+	PR*)
+		echo skipping creating draft release for pull request
+		exit 0
+	;;
 	$MAIN_BRANCH)   # Add support branches explicitly to case list e.g. $MAIN_BRANCH|3.2-180SUPPORT)
 		echo "Creating ${GIT_BRANCH} release"
 		if [ $GIT_BRANCH = $MAIN_BRANCH ]; then
