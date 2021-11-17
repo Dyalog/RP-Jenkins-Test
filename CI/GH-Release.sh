@@ -5,9 +5,12 @@ WORKSPACE=${WORKSPACE-$PWD}
 cd ${WORKSPACE}
 
 REPO_URL=`git ls-remote --get-url origin`
-REPO=`echo ${REPO_URL} | grep -o "Dyalog/.*"`
+REPO=`echo ${REPO_URL} | grep -o "Dyalog/[^.]\+"`
 PROJECT=`echo ${REPO} | cut -c 8-`
 echo ${REPO} > ___repo___
+echo $REPO_URL
+echo $REPO
+echo $PROJECT
 
 echo "Running from ${REPO_URL}"
 
