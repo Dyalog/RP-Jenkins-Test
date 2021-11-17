@@ -221,7 +221,8 @@
 
     ∇ __version←Version
       :Access public shared
-      __version←'HttpCommand' '3.7.0' '2021-11-11'
+      __version←'HttpCommand' '3.7.0-182' '2021-11-11'
+      ⍝ This is a support version included in Dyalog v18.2
     ∇
 
     ∇ make
