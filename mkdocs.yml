@@ -32,6 +32,7 @@ nav:
     - API/Link.GetItemName.md
     - API/Link.Import.md
     - API/Link.LaunchDir.md
+    - API/Link.New.md
     - API/Link.Notify.md
     - API/Link.Refresh.md
     - API/Link.Resync.md
