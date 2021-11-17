@@ -2,9 +2,16 @@
 	font-family: APL;
 	src: local("APL385 Unicode"), url("https://github.com/Dyalog/APLCourse/raw/gh-pages/autumn2021/assets/apl385.ttf");
 }
+@font-face {
+	font-family: Sarabun;
+	src: local("Sarabun"), url("https://dyalog.github.io/RP-Jenkins-Test/3.7/assets/Sarabun%20Regular%20400.ttf") format("truetype");
+}
 .language-APL {
 	font-family: APL!important;
 	line-height: 1.2em!important;
+}
+body {
+	font-family: Sarabun;
 }
 code {
 	font-family: APL;
